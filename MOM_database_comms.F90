@@ -1,5 +1,5 @@
 !> Contains routines necessary to initialize the Database client
-module MOM_dbclient
+module MOM_database_comms
 
 use MOM_cpu_clock,        only : cpu_clock_id, cpu_clock_begin, cpu_clock_end, CLOCK_ROUTINE
 use MOM_error_handler,    only : MOM_error, FATAL, WARNING, NOTE, MOM_mesg, is_root_pe
@@ -9,23 +9,23 @@ use smartredis_client,    only : dbclient_type => client_type
 implicit none; private
 
 !> Control structure to store Database client related parameters and objects
-type, public :: dbclient_CS_type
+type, public :: dbcomms_CS_type
   type(dbclient_type) :: client !< The Database client itself
   logical           :: use_dbclient !< If True, use Database within MOM6
   logical           :: colocated !< If True, the orchestrator was setup in 'co-located' mode
   logical           :: cluster   !< If True, the orchestrator has three shards or more
   integer           :: colocated_stride !< Sets which ranks will load the model from the file
                                         !! e.g. mod(rank,colocated_stride) == 0
-end type dbclient_CS_type
+end type dbcomms_CS_type
 
 public :: dbclient_type
-public :: dbclient_init
+public :: database_comms_init
 
 contains
 
-subroutine dbclient_init(param_file, CS, client_in)
+subroutine database_comms_init(param_file, CS, client_in)
   type(param_file_type),       intent(in   ) :: param_file !< Parameter file structure
-  type(dbclient_CS_type),    intent(inout) :: CS         !< Control structure for Database
+  type(dbcomms_CS_type),    intent(inout) :: CS         !< Control structure for Database
   type(dbclient_type), optional, intent(in   ) :: client_in !< If present, use a previously initialized
                                                           !! Database client
 
@@ -72,7 +72,7 @@ subroutine dbclient_init(param_file, CS, client_in)
     call cpu_clock_end(id_client_init)
 
   endif
-end subroutine dbclient_init
+end subroutine database_comms_init
 
-end module MOM_dbclient
+end module MOM_database_comms
 
